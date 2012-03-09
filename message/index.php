@@ -84,7 +84,7 @@ $PAGE->set_url($url);
 
 $PAGE->set_context(get_context_instance(CONTEXT_USER, $USER->id));
 $PAGE->navigation->extend_for_user($USER);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('standard');
 
 // Disable message notification popups while the user is viewing their messages
 $PAGE->set_popup_notification_allowed(false);

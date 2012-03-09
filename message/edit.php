@@ -67,7 +67,7 @@ $personalcontext = get_context_instance(CONTEXT_USER, $user->id);
 $coursecontext   = get_context_instance(CONTEXT_COURSE, $course->id);
 
 $PAGE->set_context($personalcontext);
-$PAGE->set_pagelayout('course');
+$PAGE->set_pagelayout('standard');
 $PAGE->requires->js_init_call('M.core_message.init_editsettings');
 
 // check access control

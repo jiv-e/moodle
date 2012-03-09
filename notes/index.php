@@ -86,7 +86,8 @@ if ($userid) {
     }
 }
 
-$PAGE->set_pagelayout('course');
+
+$PAGE->set_pagelayout('standard');
 $PAGE->set_title($course->shortname . ': ' . $strnotes);
 $PAGE->set_heading($course->fullname);
 
