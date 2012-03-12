@@ -273,7 +273,8 @@ function useredit_shared_definition(&$mform, $editoroptions = null) {
 
         $mform->addElement('filepicker', 'imagefile', get_string('newpicture'), '', array('maxbytes'=>get_max_upload_file_size($CFG->maxbytes)));
         $mform->addHelpButton('imagefile', 'newpicture');
-
+        $mform->addElement('static', 'test', '', '<span class="userpic-refresh-info">'.get_string('userpicturerefresh').'</span>');
+        
         $mform->addElement('text', 'imagealt', get_string('imagealt'), 'maxlength="100" size="30"');
         $mform->setType('imagealt', PARAM_MULTILANG);
 

@@ -167,6 +167,11 @@ class user_picture implements renderable {
      * @var bool Whether or not to open the link in a popup window.
      */
     public $popup = false;
+    
+    /**
+     * @var bool Whether to refresh this picture in browser cache. 
+     */
+    public $refresh = false;
 
     /**
      * @var string Image class attribute
@@ -357,6 +362,10 @@ class user_picture implements renderable {
             }
             // Set the image URL to the URL for the uploaded file.
             $imageurl = moodle_url::make_pluginfile_url($context->id, 'user', 'icon', NULL, $path, $filename);
+            
+            if($this->refresh) {
+                $imageurl .= '?refresh=true';
+            }
         } else if (!empty($CFG->enablegravatar)) {
             // Normalise the size variable to acceptable bounds
             if ($size < 1 || $size > 512) {

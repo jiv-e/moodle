@@ -34,4 +34,6 @@ require_once('lib/filelib.php');
 $relativepath = get_file_argument();
 $forcedownload = optional_param('forcedownload', 0, PARAM_BOOL);
 
-file_pluginfile($relativepath, $forcedownload);
+$refresh = $_GET['refresh'] === 'true' ? true : false;
+
+file_pluginfile($relativepath, $forcedownload, $refresh);

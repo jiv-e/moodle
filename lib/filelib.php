@@ -3203,7 +3203,7 @@ class filetype_parser {
  * @param bool $forcedownload
  * @todo MDL-31088 file serving improments
  */
-function file_pluginfile($relativepath, $forcedownload) {
+function file_pluginfile($relativepath, $forcedownload, $refresh = false) {
     global $DB, $CFG, $USER;
     // relative path must start with '/'
     if (!$relativepath) {
@@ -3478,7 +3478,12 @@ function file_pluginfile($relativepath, $forcedownload) {
                 $theme = theme_config::load($themename);
                 redirect($theme->pix_url('u/'.$filename, 'moodle'));
             }
-            send_stored_file($file, 60*60*24); // enable long caching, there are many images on each page
+            
+            if ($refresh) {
+                send_stored_file($file, 0);
+            } else {
+                send_stored_file($file, 60*60*24); // enable long caching, there are many images on each page
+            }
 
         } else if ($filearea === 'private' and $context->contextlevel == CONTEXT_USER) {
             require_login();

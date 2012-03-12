@@ -125,7 +125,7 @@ class user_editadvanced_form extends moodleform {
                 $fs = get_file_storage();
                 $hasuploadedpicture = ($fs->file_exists($context->id, 'user', 'icon', 0, '/', 'f2.png') || $fs->file_exists($context->id, 'user', 'icon', 0, '/', 'f2.jpg'));
                 if (!empty($user->picture) && $hasuploadedpicture) {
-                    $imagevalue = $OUTPUT->user_picture($user, array('courseid' => SITEID, 'size'=>64));
+                    $imagevalue = $OUTPUT->user_picture($user, array('courseid' => SITEID, 'size'=>64, 'refresh'=>true));
                 } else {
                     $imagevalue = get_string('none');
                 }

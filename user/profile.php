@@ -217,7 +217,7 @@ if (is_mnet_remote_user($user)) {
 }
 
 echo '<div class="userprofilebox clearfix"><div class="profilepicture">';
-echo $OUTPUT->user_picture($user, array('size'=>100));
+echo $OUTPUT->user_picture($user, array('size'=>100, 'refresh'=>true));
 echo '</div>';
 
 echo '<div class="descriptionbox"><div class="description">';
