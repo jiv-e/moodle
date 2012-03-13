@@ -218,7 +218,7 @@ if (is_mnet_remote_user($user)) {
 
 echo '<div class="userprofilebox clearfix"><div class="profilepicture">';
 $pictureoptions = array('size'=>100);
-//Ensure that user own image is refreshed when changed. See http://tracker.moodle.org/browse/MDL-31977
+//Ensure that only the users own image is read directly from the server. See http://tracker.moodle.org/browse/MDL-31977
 if ($USER->id === $user->id) {
     $pictureoptions['refresh'] = true;
 }
