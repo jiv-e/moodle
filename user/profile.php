@@ -217,7 +217,12 @@ if (is_mnet_remote_user($user)) {
 }
 
 echo '<div class="userprofilebox clearfix"><div class="profilepicture">';
-echo $OUTPUT->user_picture($user, array('size'=>100, 'refresh'=>true));
+$pictureoptions = array('size'=>100);
+//Ensure that user own image is refreshed when changed. See http://tracker.moodle.org/browse/MDL-31977
+if ($USER->id === $user->id) {
+    $pictureoptions['refresh'] = true;
+}
+echo $OUTPUT->user_picture($user, $pictureoptions);
 echo '</div>';
 
 echo '<div class="descriptionbox"><div class="description">';
