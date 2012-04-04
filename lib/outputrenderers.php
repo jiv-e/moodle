@@ -492,7 +492,7 @@ class core_renderer extends renderer_base {
     public function main_content() {
         return $this->unique_main_content_token;
     }
-
+    
     /**
      * The standard tags (typically script tags that are not needed earlier) that
      * should be output after everything else, . Designed to be called in theme layout.php files.
@@ -2232,6 +2232,65 @@ EOD;
         return html_writer::tag('div', clean_text($message), array('class' => renderer_base::prepare_classes($classes)));
     }
 
+    /**
+     * Output a popup to notify user of new messages.
+     * @todo We should propably make a message object so that we could give an
+     *     array of these as parameter for this function
+     * @param array $newmessages Array of DB objects with at least fields id,
+     *     smallmessage, fullmessageformat, notification, useridfrom, firstname,
+     *     lastname
+     */
+    public function new_messages_popup($newmessages) {
+        $strmessages = '';
+        if (count($newmessages)>1) {
+            $strmessages = get_string('unreadnewmessages', 'message', count($newmessages));
+            
+        } else {
+            $newmessages = reset($newmessages);
+
+            //show who the message is from if its not a notification
+            if (!$newmessages->notification) {
+                $strmessages = get_string('unreadnewmessage', 'message', fullname($newmessages) );
+            }
+
+            //try to display the small version of the message
+            $smallmessage = null;
+            if (!empty($newmessages->smallmessage)) {
+                //display the first 200 chars of the message in the popup
+                $textlib = textlib_get_instance();
+                $smallmessage = null;
+                if ($textlib->strlen($newmessages->smallmessage) > 200) {
+                    $smallmessage = $textlib->substr($newmessages->smallmessage,0,200).'...';
+                } else {
+                    $smallmessage = $newmessages->smallmessage;
+                }
+
+                //prevent html symbols being displayed
+                if ($newmessages->fullmessageformat == FORMAT_HTML) {
+                    $smallmessage = html_to_text($smallmessage);
+                } else {
+                    $smallmessage = s($smallmessage);
+                }
+            } else if ($newmessages->notification) {
+                //its a notification with no smallmessage so just say they have a notification
+                $smallmessage = get_string('unreadnewnotification', 'message');
+            }
+        }
+        $output = html_writer::start_tag('div', array('id'=>'newmessageoverlay','class'=>'mdl-align')).
+                html_writer::tag('div', $strmessages, array('id'=>'newmessagetext'));
+        if(!empty($smallmessage)) {
+            $output .= html_writer::tag('div', $smallmessage, array('id'=>'usermessage'));       
+        }
+        
+        $output .= html_writer::start_tag('div', array('id'=>'newmessagelinks')).
+                html_writer::link($url, get_string('gotomessages', 'message'), array('id'=>'notificationyes')).'&nbsp;&nbsp;&nbsp;'.
+                html_writer::link('', get_string('ignore','admin'), array('id'=>'notificationno')).
+                html_writer::end_tag('div').
+                html_writer::end_tag('div');
+        
+        return $output;
+    }
+    
     /**
      * Returns HTML to display a continue button that goes to a particular URL.
      *

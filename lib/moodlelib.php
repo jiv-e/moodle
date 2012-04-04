@@ -9838,7 +9838,7 @@ function moodle_request_shutdown() {
   * @return void
   */
 function message_popup_window() {
-    global $USER, $DB, $PAGE, $CFG, $SITE;
+    global $USER, $DB, $PAGE, $CFG, $SITE, $OUTPUT;
 
     if (!$PAGE->get_popup_notification_allowed() || empty($CFG->messaging)) {
         return;
@@ -9862,7 +9862,7 @@ function message_popup_window() {
     }
 
     //got unread messages so now do another query that joins with the user table
-    $messagesql = "SELECT m.id, m.smallmessage, m.fullmessageformat, m.notification, u.firstname, u.lastname
+    $messagesql = "SELECT m.id, m.smallmessage, m.fullmessageformat, m.notification, m.useridfrom, u.firstname, u.lastname
                      FROM {message} m
                      JOIN {message_working} mw ON m.id=mw.unreadmessageid
                      JOIN {message_processors} p ON mw.processorid=p.id
@@ -9877,66 +9877,13 @@ function message_popup_window() {
         $messagesql .= 'AND m.timecreated > :lastpopuptime';
     }
 
-    $message_users = $DB->get_records_sql($messagesql, array('userid'=>$USER->id, 'lastpopuptime'=>$USER->message_lastpopup));
+    $newmessages = $DB->get_records_sql($messagesql, array('userid'=>$USER->id, 'lastpopuptime'=>$USER->message_lastpopup));
 
     //if we have new messages to notify the user about
-    if (!empty($message_users)) {
-
-        $strmessages = '';
-        if (count($message_users)>1) {
-            $strmessages = get_string('unreadnewmessages', 'message', count($message_users));
-        } else {
-            $message_users = reset($message_users);
-
-            //show who the message is from if its not a notification
-            if (!$message_users->notification) {
-                $strmessages = get_string('unreadnewmessage', 'message', fullname($message_users) );
-            }
-
-            //try to display the small version of the message
-            $smallmessage = null;
-            if (!empty($message_users->smallmessage)) {
-                //display the first 200 chars of the message in the popup
-                $textlib = textlib_get_instance();
-                $smallmessage = null;
-                if ($textlib->strlen($message_users->smallmessage) > 200) {
-                    $smallmessage = $textlib->substr($message_users->smallmessage,0,200).'...';
-                } else {
-                    $smallmessage = $message_users->smallmessage;
-                }
-
-                //prevent html symbols being displayed
-                if ($message_users->fullmessageformat == FORMAT_HTML) {
-                    $smallmessage = html_to_text($smallmessage);
-                } else {
-                    $smallmessage = s($smallmessage);
-                }
-            } else if ($message_users->notification) {
-                //its a notification with no smallmessage so just say they have a notification
-                $smallmessage = get_string('unreadnewnotification', 'message');
-            }
-            if (!empty($smallmessage)) {
-                $strmessages .= '<div id="usermessage">'.s($smallmessage).'</div>';
-            }
-        }
-
-        $strgomessage = get_string('gotomessages', 'message');
-        $strstaymessage = get_string('ignore','admin');
-
+    if (!empty($newmessages)) {
+        $content = $OUTPUT->new_messages_popup($newmessages);  
         $url = $CFG->wwwroot.'/message/index.php';
-        $content =  html_writer::start_tag('div', array('id'=>'newmessageoverlay','class'=>'mdl-align')).
-                        html_writer::start_tag('div', array('id'=>'newmessagetext')).
-                            $strmessages.
-                        html_writer::end_tag('div').
-
-                        html_writer::start_tag('div', array('id'=>'newmessagelinks')).
-                            html_writer::link($url, $strgomessage, array('id'=>'notificationyes')).'&nbsp;&nbsp;&nbsp;'.
-                            html_writer::link('', $strstaymessage, array('id'=>'notificationno')).
-                        html_writer::end_tag('div');
-                    html_writer::end_tag('div');
-
         $PAGE->requires->js_init_call('M.core_message.init_notification', array('', $content, $url));
-
         $USER->message_lastpopup = time();
     }
 }
